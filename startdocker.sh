@@ -1,1 +1,1 @@
-docker run --mount type=bind,src=.,dst=/project -it aarch64gcc:latest
+docker run --mount type=bind,src=.,dst=/project -it linuxbuilder:latest
