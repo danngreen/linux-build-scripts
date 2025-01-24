@@ -1,13 +1,15 @@
-export BL31 ?= $(PWD)/trusted-firmware-a/build/rk3568/release/bl31/bl31.elf 
+# This file is provided by rockchip in the rkbin github repo
 export ROCKCHIP_TPL ?= $(PWD)/rockchip-images/rk3566_ddr_1056MHz_v1.23.bin 
-#
-# CROSS_COMPILE ?= $(HOME)/bin/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
+
 export CROSS_COMPILE ?= aarch64-none-linux-gnu-
 
-BUILD_DIR ?= build
+BUILD_DIR ?= $(PWD)/build
 
 ######################### Help #####################
 help:
+	$(info -)
+	$(info Available targets:)
+	$(info    u-boot    tfa    linux    fs)
 	$(info -)
 	$(info Put the cross compiler on your path: aarch64-none-linux-gnu-)
 	$(info -)
@@ -18,20 +20,32 @@ help:
 	$(info -)
 
 ######################### TFA #####################
-tfa:
-	rm -rf $(BUILD_DIR)/tfa
-	mkdir -p $(BUILD_DIR)/tfa
-	#TODO
+BL31 ?= $(BUILD_DIR)/tfa/rk3568/release/bl31/bl31.elf 
 
-.PHONY: tfa
+tfa: $(BL31)
+
+$(BL31):
+	mkdir -p $(BUILD_DIR)/tfa
+	cd trusted-firmware-a && make BUILD_BASE=../$(BUILD_DIR)/tfa realclean
+	cd trusted-firmware-a && make BUILD_BASE=../$(BUILD_DIR)/tfa PLAT=rk3568
+
+
+clean-tfa:
+	rm -rf $(BUILD_DIR)/tfa
+	cd trusted-firmware-a && make realclean
+
+.PHONY: tfa 
+
 
 ######################### U-Boot #####################
-u-boot:
-	rm -rf $(BUILD_DIR)/u-boot
+u-boot: $(BL31)
 	mkdir -p $(BUILD_DIR)/u-boot
-	cd u-boot && make distclean
 	cd u-boot && make O=../$(BUILD_DIR)/u-boot radxa-zero-3-rk3566_defconfig
-	cd u-boot && make O=../$(BUILD_DIR)/u-boot 
+	cd u-boot && make O=../$(BUILD_DIR)/u-boot BL31=$(BL31)
+
+clean-u-boot:
+	rm -rf $(BUILD_DIR)/u-boot
+	cd u-boot && make distclean
 
 # alias
 uboot: u-boot
@@ -67,3 +81,4 @@ flash-sd:
 
 clean:
 	rm -rf $(BUILD_DIR)
+
