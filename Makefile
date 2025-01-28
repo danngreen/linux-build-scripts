@@ -8,6 +8,10 @@ LINUX_DTB ?= rk3566-radxa-cm3-io.dtb
 
 # SD Card device stem for partitions
 SDCARD_DISKP ?= /dev/disk4s
+SDCARD_DISK ?= /dev/disk4
+#
+# SDCARD_DISKP ?= /dev/sdb
+# SDCARD_DISK ?= /dev/sdb
 
 # Where partition 2 of the SD Card is mounted (must already be formatted as FATFS)
 SDCARD_LINUX_IMG_VOL ?= /Volumes/LINIMG  
@@ -37,6 +41,8 @@ help:
 	$(info Use the format-partition-sdcard.sh script to prepare an SD Card)
 	$(info before running `make flash-sd`)
 	$(info )
+
+.PHONY: help
 
 ######################### TFA #####################
 BL31 ?= $(BUILD_DIR)/tfa/rk3568/release/bl31/bl31.elf 
@@ -106,12 +112,13 @@ all: u-boot linux fs
 ######################### Flashing an SD Card #####################
 
 flash-sd:
-	sudo dd if=$(BUILD_DIR)/u-boot/u-boot-rockchip.bin of=$(SDCARD_DISKP)1 seek=64
-	cp $(BUILD_DIR)/linux/Image $(SDCARD_LINUX_IMG_VOL)
-	cp $(BUILD_DIR)/linux/rk3566-radxa-zero-3e.dtb $(SDCARD_LINUX_IMG_VOL)
+	sudo dd if=$(BUILD_DIR)/u-boot/u-boot-rockchip.bin of=$(SDCARD_DISK) seek=64
+	cp $(BUILD_DIR)/linux/arch/arm64/boot/Image $(SDCARD_LINUX_IMG_VOL)
+	cp $(BUILD_DIR)/linux/arch/arm64/boot/dts/rockchip/$(LINUX_DTB) $(SDCARD_LINUX_IMG_VOL)
 	sudo dd if=$(BUILD_DIR)/fs/images/rootfs.ext2 of=$(SDCARD_DISKP)3
 	$(info Please unmount SD Card now)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
+# make O=../build/linux ARCH=arm64 INSTALL_MOD_PATH=../ modules_install
