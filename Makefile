@@ -99,7 +99,9 @@ FS_DEFCONFIG ?= $(PWD)/buildroot-configs/cortexa55-alsa-kernel612_defconfig
 
 fs: linux-modules
 	mkdir -p $(BUILD_DIR)/fs
-	cd buildroot && make O=$(BUILD_DIR)/fs defconfig BR2_DEFCONFIG=$(FS_DEFCONFIG)
+	cd buildroot && make O=$(BUILD_DIR)/fs defconfig \
+		BR2_DEFCONFIG=$(FS_DEFCONFIG) \
+		BR2_ROOTFS_OVERLAY=../fs-overlay
 	cd buildroot && make O=$(BUILD_DIR)/fs 
 
 clean-fs:
