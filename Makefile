@@ -7,8 +7,8 @@ LINUX_DTB ?= rk3566-radxa-cm3-io.dtb
 # LINUX_DTB ?= rk3566-radxa-zero-3e.dtb
 
 # SD Card device stem for partitions
-SDCARD_DISKP ?= /dev/disk4s
-SDCARD_DISK ?= /dev/disk4
+# SDCARD_DISKP ?= /dev/disk4s
+# SDCARD_DISK ?= /dev/disk4
 #
 # SDCARD_DISKP ?= /dev/sdb
 # SDCARD_DISK ?= /dev/sdb
@@ -85,7 +85,6 @@ linux:
 	cd linux && make O=$(BUILD_DIR)/linux ARCH=arm64 -j8
 
 linux-modules:
-	mkdir -p fs-overlay
 	cd linux && make O=../build/linux ARCH=arm64 INSTALL_MOD_PATH=../fs-overlay modules_install
 
 clean-linux:
