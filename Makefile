@@ -84,18 +84,22 @@ linux:
 	cd linux && make O=$(BUILD_DIR)/linux ARCH=arm64 defconfig
 	cd linux && make O=$(BUILD_DIR)/linux ARCH=arm64 -j8
 
+linux-modules:
+	mkdir -p fs-overlay
+	cd linux && make O=../build/linux ARCH=arm64 INSTALL_MOD_PATH=../fs-overlay modules_install
+
 clean-linux:
 	rm -rf $(BUILD_DIR)/linux
 	cd linux && make distclean
 
-.PHONY: linux clean-linux
+.PHONY: linux clean-linux linux-modules
 
 ######################### Filesystem #####################
 
 FS_DEFCONFIG ?= $(PWD)/buildroot-configs/cortexa55-alsa-kernel612_defconfig
 
-fs:
-	mkdir -p $(BUILD_DIR)/buildroot
+fs: linux-modules
+	mkdir -p $(BUILD_DIR)/fs
 	cd buildroot && make O=$(BUILD_DIR)/fs defconfig BR2_DEFCONFIG=$(FS_DEFCONFIG)
 	cd buildroot && make O=$(BUILD_DIR)/fs 
 
@@ -121,4 +125,3 @@ flash-sd:
 clean:
 	rm -rf $(BUILD_DIR)
 
-# make O=../build/linux ARCH=arm64 INSTALL_MOD_PATH=../ modules_install
