@@ -3,7 +3,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt update
 RUN apt install -y git rsync gcc g++ make device-tree-compiler bc flex bison lz4 libssl-dev libgmp-dev libmpc-dev expect expect-dev file unzip bzip2 fakeroot bsdmainutils
-RUN apt install -y python2 python3 python-is-python3 wget xxd libncurses-dev cpio xz-utils python3-setuptools swig python3-dev uuid-dev
+RUN apt install -y python2 python3 python-is-python3 wget xxd libncurses-dev cpio xz-utils python3-setuptools swig python3-dev uuid-dev python3-pyelftools
 RUN apt install -y libgnutls28-dev
 
 RUN apt install -y sudo bash-completion
@@ -32,7 +32,7 @@ RUN tar xf gcc-aarch64-none-linux-gnu.tar -C gcc-aarch64-none-linux-gnu --strip-
 RUN rm gcc-aarch64-none-linux-gnu.tar
 
 ENV PATH="/gcc-aarch64-none-linux-gnu/bin:${PATH}"
-ENV CROSS_COMPILE=aarch64-none-linux-gnueabihf-
+ENV CROSS_COMPILE=aarch64-none-linux-gnu-
 
 USER worker
 WORKDIR /project
