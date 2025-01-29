@@ -10,11 +10,14 @@ LINUX_DTB ?= rk3566-radxa-cm3-io.dtb
 # SDCARD_DISKP ?= /dev/disk4s
 # SDCARD_DISK ?= /dev/disk4
 #
-# SDCARD_DISKP ?= /dev/sdb
-# SDCARD_DISK ?= /dev/sdb
+# SDCARD_DISKP ?= /dev/sda
+# SDCARD_DISK ?= /dev/sda
+
+SDCARD_DISKP ?= $(SDCARD_DISK)
 
 # Where partition 2 of the SD Card is mounted (must already be formatted as FATFS)
-SDCARD_LINUX_IMG_VOL ?= /Volumes/LINIMG  
+# SDCARD_LINUX_IMG_VOL ?= /Volumes/LINIMG  
+SDCARD_LINUX_IMG_VOL ?= /media/sd
 
 ############################
 
@@ -66,6 +69,7 @@ clean-tfa:
 u-boot: $(BL31)
 	mkdir -p $(BUILD_DIR)/u-boot
 	cd u-boot && make O=$(BUILD_DIR)/u-boot $(UBOOT_BOARD)
+	cd u-boot && scripts/kconfig/merge_config.sh -O '$(BUILD_DIR)/u-boot' '$(BUILD_DIR)/u-boot/.config' '../configs/u-boot.cfg' 
 	cd u-boot && make O=$(BUILD_DIR)/u-boot BL31=$(BL31)
 
 clean-u-boot:
@@ -95,7 +99,7 @@ clean-linux:
 
 ######################### Filesystem #####################
 
-FS_DEFCONFIG ?= $(PWD)/buildroot-configs/cortexa55-alsa-kernel612_defconfig
+FS_DEFCONFIG ?= $(PWD)/configs/buildroot_cortexa55-alsa-kernel612_defconfig
 
 fs: linux-modules
 	mkdir -p $(BUILD_DIR)/fs
