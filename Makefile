@@ -124,7 +124,7 @@ flash-u-boot:
 	sudo dd if=$(BUILD_DIR)/u-boot/u-boot-rockchip.bin of=$(SDCARD_DISK) seek=64
 
 flash-linux:
-	sudo mount $(SDCARD_DISK) $(SDCARD_LINUX_IMG_VOL)
+	sudo mount $(SDCARD_DISKP)2 $(SDCARD_LINUX_IMG_VOL)
 	sudo cp $(BUILD_DIR)/linux/arch/arm64/boot/Image $(SDCARD_LINUX_IMG_VOL)
 	sudo cp $(BUILD_DIR)/linux/arch/arm64/boot/dts/rockchip/$(LINUX_DTB) $(SDCARD_LINUX_IMG_VOL)
 	sudo umount $(SDCARD_LINUX_IMG_VOL)
