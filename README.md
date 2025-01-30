@@ -1,14 +1,13 @@
 ## Linux Build Scripts
 
 This is a simple Makefile for building Linux, bootloaders, and root filesystem
-for an embedded device. Currently we are targetting the Radxa CM3 + IO board
-(Rockchip RK3566).
+(using buildroot) for an embedded device. Currently we are targetting the Radxa
+CM3 + IO board (Rockchip RK3566).
 
 The build is meant to be as simple as possible without extra menus/configs. The
-Makefile is simple and does not do anything smart, so it's likely you will need
-to edit it if you need to change things.
+Makefile is simple and does not do anything smart.
 
-The Dockerfile defines a container which should be used for reproducable
+The Dockerfile defines a container which should be used for reproducible
 builds.
 
 ## Setup 
@@ -147,5 +146,43 @@ is different.
 
 I don't know where the addresses in the bootcmd come from. TODO!
 
+## Re-configuring
+To re-configure or customize, the general process is to modify the files in `configs/`.
+  - U-boot:
+      ```
+      cd u-boot
+      make O=../build/u-boot menuconfig
+      make O=../build/u-boot savedefconfig
+      ```
+      Do a diff on the defconfig in the u-boot tree vs. the original, and then
+      add/change `configs/u-boot.cfg` file. Revert the defconfig file back.
 
+  - Busybox:
+      Add/change the busybox.fragment file manually (not sure how to discover these configs?)
+
+  - Buildroot (fs):
+      ```
+      cd buildroot
+      make O=../build/fs menuconfig
+      make O=../build/fs savedefconfig
+      ```
+      The defconfig file is in configs/, so just commit it and that's it.
+
+  - Linux kernel:
+      Not sure how to do this yet. 
+      Currently we are using the default defconfig for arch64 (there is a generic_defconfig in configs/ but it's not used)
+      Maybe use `linux/scripts/diffconfig`?
+
+  - Linux kernel modules:
+      Not sure how to do this yet.
+
+  - Linux DTB:
+      Not sure how to do this yet. Overlays?
+
+
+## TODO:
+
+- Integrate our own device tree without a fork of the linux source.
+
+- Manage modifications to kernel modules.
 
