@@ -48,7 +48,7 @@ set -x
 sudo sgdisk --resize-table=128 -a 1 \
 	-n 1:128:32767 -c 1:uboot \
 	-n 2:32768:+64M -c 2:linimg \
-	-N 3 -c 3:fatfs \
+	-N 3 -c 3:rootfs \
 	-t 3:EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 \
 	-p $DISK || exit
 set +x
@@ -61,7 +61,6 @@ case "$(uname -s)" in
 	Darwin)
 		set -x
 		diskutil eraseVolume FAT32 LINIMG ${DISKSTEM}2 || exit
-		# diskutil eraseVolume FAT32 FILESYS ${DISKSTEM}3 || exit
 		sleep 1
 		echo "Unmounting so macOS sees the new partitions"
 		diskutil unmountDisk $DISK || exit
@@ -73,7 +72,6 @@ case "$(uname -s)" in
 		sudo umount ${DISKSTEM}2
 		sudo umount ${DISKSTEM}3
 		sudo mkfs.fat -F 32 -n LINIMG ${DISKSTEM}2 || exit
-		# sudo mkfs.fat -F 32 -n FILESYS ${DISKSTEM}3 || exit
 		set +x
 		;;
 	*)

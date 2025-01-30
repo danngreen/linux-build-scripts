@@ -30,11 +30,10 @@ BUILD_DIR ?= $(PWD)/build
 
 ######################### Help #####################
 help:
+	$(info This is meant to be run from within the Docker container)
 	$(info -)
 	$(info Available targets:)
-	$(info    u-boot    tfa    linux    fs    all    flash-sd)
-	$(info -)
-	$(info Put the aarch64-none-linux-gnu-gcc cross compiler on your PATH)
+	$(info    u-boot    tfa    linux    linux-modules    fs    all    flash-sd)
 	$(info -)
 	$(info Choose your board with UBOOT_BOARD and LINUX_DTB env vars -- see commented lines at top of this Makefile)
 	$(info -)
@@ -120,12 +119,21 @@ all: u-boot linux fs
 
 ######################### Flashing an SD Card #####################
 
-flash-sd:
+flash-u-boot:
+	sudo umount $(SDCARD_DISK)
 	sudo dd if=$(BUILD_DIR)/u-boot/u-boot-rockchip.bin of=$(SDCARD_DISK) seek=64
-	cp $(BUILD_DIR)/linux/arch/arm64/boot/Image $(SDCARD_LINUX_IMG_VOL)
-	cp $(BUILD_DIR)/linux/arch/arm64/boot/dts/rockchip/$(LINUX_DTB) $(SDCARD_LINUX_IMG_VOL)
+
+flash-linux:
+	sudo mount $(SDCARD_DISK) $(SDCARD_LINUX_IMG_VOL)
+	sudo cp $(BUILD_DIR)/linux/arch/arm64/boot/Image $(SDCARD_LINUX_IMG_VOL)
+	sudo cp $(BUILD_DIR)/linux/arch/arm64/boot/dts/rockchip/$(LINUX_DTB) $(SDCARD_LINUX_IMG_VOL)
+	sudo umount $(SDCARD_LINUX_IMG_VOL)
+
+flash-rootfs:
 	sudo dd if=$(BUILD_DIR)/fs/images/rootfs.ext2 of=$(SDCARD_DISKP)3
-	$(info Please unmount SD Card now)
+
+flash-sd: flash-u-boot flash-linux flash-rootfs
+	$(info Done! Ready to boot from SD card)
 
 clean:
 	rm -rf $(BUILD_DIR)
